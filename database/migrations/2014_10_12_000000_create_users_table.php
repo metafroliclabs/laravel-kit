@@ -20,8 +20,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('avatar')->nullable();
-            $table->string('device_id')->nullable();
-            $table->string('device_type')->nullable();
+            // $table->string('device_id')->nullable();
+            // $table->string('device_type')->nullable();
             $table->tinyInteger('role_id');
             $table->text('bio')->nullable();
             $table->boolean('status')->default(1);
