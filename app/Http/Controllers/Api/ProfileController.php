@@ -27,7 +27,7 @@ class ProfileController extends Controller
     public function edit_profile(UpdateUserRequest $request){
         $user = $this->user->find(auth()->id());
         if ($request->image) {
-            $avatar = uploadImage($request->image);
+            $avatar = uploadFile($request->image);
             $request->merge(['avatar' => $avatar]);
         }
         $user->update($request->all());
@@ -49,7 +49,7 @@ class ProfileController extends Controller
 
     // public function change_avatar(UpdateAvatarRequest $request){
     //     $user = $this->user->find(auth()->id());
-    //     $avatar = uploadImage($request->profile);
+    //     $avatar = uploadFile($request->profile);
     //     if($avatar){
     //         if($user->avatar !== "storage/default.png"){
     //             if(file_exists(public_path()."/".$user->avatar)){

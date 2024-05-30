@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Http;
+
 // api response function
 function apiResponse($status, $message, $http = 200, $data = null)
 {
@@ -23,35 +25,35 @@ function customResponse($status, $msg, $http = 200, $data = [])
     ];
 }
 
-// upload single image
-function uploadImage($image, $pre = "")
+// upload single file
+function uploadFile($file, $pre = "Img", $path = "upload")
 {
-    $filename = $pre . date("YmdHis") . '.' . $image->extension();
-    if ($path = $image->storeAs('public/upload/', $filename)) {
-        return "storage/upload/{$filename}";
+    $filename = $pre .'_'. date("YmdHis") .'.'. $file->extension();
+    if ($path = $file->storeAs("public/{$path}/", $filename)) {
+        return "storage/{$path}/{$filename}";
     }
 }
 
-// upload more than one images
-function uploadManyImages($images)
+// upload more than one file
+function uploadManyFiles($files, $pre = "Img", $path = "upload")
 {
     $allowedExtensions = ['jpg', 'png', 'jpeg'];
 
-    foreach ($images as $key => $image) {
-        $extension = $image->extension();
+    foreach ($files as $key => $file) {
+        $extension = $file->extension();
 
         if (in_array($extension, $allowedExtensions)) {
-            $image_name = 'ads_' . date("YmdHisu") . $key . '.' . $extension;
-            if ($path = $image->storeAs('public/', $image_name)) {
-                $image_info['name'] = $image_name;
-                $image_info['type'] = $extension;
-                $response[] = $image_info;
+            $file_name = $pre .'_'. date("YmdHisu") . $key .'.'. $extension;
+            if ($path = $file->storeAs("public/{$path}/", $file_name)) {
+                $file_info['name'] = $file_name;
+                $file_info['type'] = $extension;
+                $response[] = $file_info;
             }
         } else {
             return customResponse(false, "Only jpg, png, jpeg files are allowed");
         }
     }
-    return customResponse(true, "Images uploaded successfully", 200, $response);
+    return customResponse(true, "Files uploaded successfully", 200, $response);
 }
 
 // format date from string
@@ -68,4 +70,27 @@ function formatTime($str)
     $time = new DateTime($str);
     $formatted = $time->format('H:i A');
     return $formatted;
+}
+
+// send push notification
+function sendPushNotification($user, $title, $body, $id = 1)
+{
+    if ($user->device_tokens->count() > 0){
+        $ids = $user->device_tokens->pluck('device_id')->toArray();
+        $fields = [
+            "registration_ids" => $ids,
+            "notification" => [
+                "title" => $title,
+                "body" => $body,
+            ],
+            "data" => ["key" => $id]
+        ];
+
+        $response = Http::withBody(json_encode($fields))->withHeaders([
+            'Authorization' => 'key='. env('FIREBASE_SERVER_KEY'),
+            'Content-Type'  => 'application/json',
+        ])->post('https://fcm.googleapis.com/fcm/send');
+
+        return $response->json();
+    }
 }

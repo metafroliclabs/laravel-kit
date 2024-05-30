@@ -5,29 +5,30 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
-use App\Models\User;
+use App\Models\DeviceToken;
+use App\Services\AuthService;
 use Exception;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public $user;
+    public $authService;
 
-    public function __construct(User $user)
+    public function __construct(AuthService $authService)
     {
-        $this->user = $user;
+        $this->authService = $authService;
     }
 
     public function signup(SignupRequest $request){
         try{
             if ($request->image) {
-                $avatar = uploadImage($request->image);
+                $avatar = uploadFile($request->image);
                 $request->merge(['avatar' => $avatar]);
             } else {
                 $request->merge(['avatar' => 'storage/default.png']);
             }
 
-            $user = $this->user->add($request);
+            $response = $this->authService->create($request);
             return apiResponse(true, "Profile has been created successfully.");
         }
         catch(Exception $e){
@@ -37,7 +38,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request){
         try{
-            $response = $this->user->login($request);
+            $response = $this->authService->login($request);
             return apiResponse(...$response);
         }catch(Exception $e){
             return apiResponse(false, $e->getMessage(), 500);
@@ -46,7 +47,7 @@ class AuthController extends Controller
 
     public function login_admin(LoginRequest $request){
         try{
-            $response = $this->user->login_admin($request);
+            $response = $this->authService->login_admin($request);
             return apiResponse(...$response);
         }catch(Exception $e){
             return apiResponse(false, $e->getMessage(), 500);
@@ -55,6 +56,9 @@ class AuthController extends Controller
 
     public function logout(Request $request){
         try{
+            if ($request->device_id) {
+                DeviceToken::where('user_id', auth()->id())->where('device_id', $request->device_id)->delete();
+            }
             $request->user()->currentAccessToken()->delete();
             return apiResponse(true, "logout successfully!");
         }catch(Exception $e){
