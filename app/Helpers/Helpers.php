@@ -26,16 +26,16 @@ function customResponse($status, $msg, $http = 200, $data = [])
 }
 
 // upload single file
-function uploadFile($file, $pre = "Img", $path = "upload")
+function uploadFile($file, $pre = "Img", $folder = "upload")
 {
     $filename = $pre .'_'. date("YmdHis") .'.'. $file->extension();
-    if ($path = $file->storeAs("public/{$path}/", $filename)) {
-        return "storage/{$path}/{$filename}";
+    if ($path = $file->storeAs("public/{$folder}/", $filename)) {
+        return "storage/{$folder}/{$filename}";
     }
 }
 
 // upload more than one file
-function uploadManyFiles($files, $pre = "Img", $path = "upload")
+function uploadManyFiles($files, $pre = "Img", $folder = "upload")
 {
     $allowedExtensions = ['jpg', 'png', 'jpeg'];
 
@@ -44,7 +44,7 @@ function uploadManyFiles($files, $pre = "Img", $path = "upload")
 
         if (in_array($extension, $allowedExtensions)) {
             $file_name = $pre .'_'. date("YmdHisu") . $key .'.'. $extension;
-            if ($path = $file->storeAs("public/{$path}/", $file_name)) {
+            if ($path = $file->storeAs("public/{$folder}/", $file_name)) {
                 $file_info['name'] = $file_name;
                 $file_info['type'] = $extension;
                 $response[] = $file_info;
