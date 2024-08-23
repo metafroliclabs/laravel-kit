@@ -9,16 +9,18 @@ use Stripe\StripeClient;
 
 class PaymentService
 {
-    private static $type;
-    private static $amount;
+    private $stripe;
+    private $type;
+    private $amount;
 
     private function __construct($type, $amount)
     {
         self::$type   = $type;
         self::$amount = $amount;
+        self::$stripe = new StripeClient(env('STRIPE_SECRET'));
     }
 
-    public static function initiate($type = 'order', $amount = 0)
+    public function initiate($type = 'order', $amount = 0)
     {
         try {
             return new self($type, $amount);
@@ -30,7 +32,7 @@ class PaymentService
         }
     }
 
-    public static function makePayment($request)
+    public function handlePayment($request)
     {
         try {
             if (!isset(self::$type) || !isset(self::$amount)) {
@@ -39,8 +41,7 @@ class PaymentService
 
             $name = auth()->user()->first_name ."'s ". self::$type ." for $". self::$amount;
 
-            $stripe  = new StripeClient(env('STRIPE_SECRET'));
-            // $product = $stripe->products->create([
+            // $product = $this->stripe->products->create([
             //     // 'id'=> $uniqueProductId,
             //     'name'        => $name,
             //     'description' => $name,
@@ -49,13 +50,13 @@ class PaymentService
             //         'https://files.stripe.com/links/MDB8YWNjdF8xS2Vld2tLY2lOUHR6b1RpfGZsX3Rlc3RfYkZzRkM5UkxYMTFRUHFTQ21mNWM2ZFQx00GF3YS6op'
             //     ],
             // ]);
-            // $price = $stripe->prices->create([
+            // $price = $this->stripe->prices->create([
             //     'product'      => $product['id'],
             //     'unit_amount'  => ((int) (self::$amount * 100)),
             //     'currency'     => 'usd',
             //     'tax_behavior' => 'exclusive',
             // ]);
-            $checkoutStripeSession = $stripe->checkout->sessions->create([
+            $checkoutStripeSession = $this->stripe->checkout->sessions->create([
                 'customer_email'       => auth()->user()->email,
                 'success_url'          => route(self::$type . '.success'),
                 'cancel_url'           => route(self::$type . '.cancel'),
@@ -88,13 +89,11 @@ class PaymentService
         }
     }
 
-    public static function paymentSuccess($stripeSessionId)
+    public function handlePaymentSuccess($stripeSessionId)
     {
         try {
-            $stripe = new StripeClient(env('STRIPE_SECRET'));
-
             if (isset($stripeSessionId)) {
-                $stripe_response = $stripe->checkout->sessions->retrieve($stripeSessionId, []);
+                $stripe_response = $this->stripe->checkout->sessions->retrieve($stripeSessionId, []);
                 $service_message = json_decode($stripe_response->metadata->service_message);
 
                 if ($stripe_response->payment_status == "paid") {

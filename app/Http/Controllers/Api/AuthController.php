@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\Constant;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
@@ -25,7 +26,7 @@ class AuthController extends Controller
                 $avatar = uploadFile($request->image);
                 $request->merge(['avatar' => $avatar]);
             } else {
-                $request->merge(['avatar' => 'storage/default.png']);
+                $request->merge(['avatar' => Constant::DEFAULT_AVATAR]);
             }
 
             $response = $this->authService->create($request);

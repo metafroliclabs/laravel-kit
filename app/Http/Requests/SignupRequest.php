@@ -2,11 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
-
-class SignupRequest extends FormRequest
+class SignupRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,10 +26,5 @@ class SignupRequest extends FormRequest
             'password' => 'required|min:8',
             'image' => 'nullable|file|mimes:jpeg,png,jpg|max:4096',
         ];
-    }
-    
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(apiResponse(false, $validator->errors()->first(), 422));
     }
 }

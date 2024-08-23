@@ -5,12 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ForgetPasswordRequest;
 use App\Http\Requests\ResetPasswordRequest;
-use App\Mail\PasswordResetCodeMail;
 use App\Models\PasswordReset;
 use App\Models\User;
+use App\Notifications\ForgetPasswordNotification;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 
 class ForgetPasswordController extends Controller
 {
@@ -28,8 +27,8 @@ class ForgetPasswordController extends Controller
             $delete  = $this->passwordReset->email($request->email)->delete();
             $code    = $this->passwordReset->getCode();
             $message = $this->passwordReset->saveCode($request->email, $code);
-            
-            Mail::to($request->email)->send(new PasswordResetCodeMail($user, $code));
+
+            $user->notify(new ForgetPasswordNotification($code));
             return apiResponse(...$message);
         }catch(Exception $e){
             return apiResponse(false, $e->getMessage(), 500);

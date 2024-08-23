@@ -2,11 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
-
-class ForgetPasswordRequest extends FormRequest
+class ForgetPasswordRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,10 +22,5 @@ class ForgetPasswordRequest extends FormRequest
         return [
             'email' => 'required|email|exists:users,email'
         ];
-    }
-
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(apiResponse(false, $validator->errors()->first(), 422));
     }
 }

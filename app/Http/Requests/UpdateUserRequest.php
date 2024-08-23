@@ -2,11 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
-
-class UpdateUserRequest extends FormRequest
+class UpdateUserRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,10 +25,5 @@ class UpdateUserRequest extends FormRequest
             'image' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
             'bio' => 'sometimes',
         ];
-    }
-
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(apiResponse(false, $validator->errors()->first(), 422));
     }
 }

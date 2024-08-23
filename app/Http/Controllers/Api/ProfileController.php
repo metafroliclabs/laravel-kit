@@ -51,7 +51,7 @@ class ProfileController extends Controller
     //     $user = $this->user->find(auth()->id());
     //     $avatar = uploadFile($request->profile);
     //     if($avatar){
-    //         if($user->avatar !== "storage/default.png"){
+    //         if($user->avatar !== Constant::DEFAULT_AVATAR){
     //             if(file_exists(public_path()."/".$user->avatar)){
     //                 unlink(public_path()."/".$user->avatar);
     //             }

@@ -1,8 +1,9 @@
 <?php
 
+use App\Helpers\Constant;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 
-// api response function
 function apiResponse($status, $message, $http = 200, $data = null)
 {
     $response['status'] = $status;
@@ -10,11 +11,9 @@ function apiResponse($status, $message, $http = 200, $data = null)
     if (!is_null($data) && !empty($data)) {
         $response['data'] = $data;
     }
-
     return response()->json($response, $http);
 }
 
-// function response
 function customResponse($status, $msg, $http = 200, $data = [])
 {
     return [
@@ -25,38 +24,60 @@ function customResponse($status, $msg, $http = 200, $data = [])
     ];
 }
 
-// upload single file
-function uploadFile($file, $pre = "Img", $folder = "upload")
+function generateFilename($prefix, $extension, $key)
 {
-    $filename = $pre .'_'. date("YmdHis") .'.'. $file->extension();
-    if ($path = $file->storeAs("public/{$folder}/", $filename)) {
-        return "storage/{$folder}/{$filename}";
-    }
+    return $prefix . '_' . date("YmdHis") . $key . '.' . $extension;
 }
 
-// upload more than one file
-function uploadManyFiles($files, $pre = "Img", $folder = "upload")
+function uploadFile($file, $prefix = "Img", $folder = "upload", $key = 0)
 {
-    $allowedExtensions = ['jpg', 'png', 'jpeg'];
+    $filename = generateFilename($prefix, $file->extension(), $key);
+    $path = $file->storeAs("public/{$folder}/", $filename);
+    return $path ? "storage/{$folder}/{$filename}" : null;
+}
 
+function deleteFile($file)
+{
+    if ($file !== Constant::DEFAULT_AVATAR) {
+        $filePath = public_path($file);
+        if (File::exists($filePath)) {
+            File::delete($filePath);
+        }
+    }
+    return true;
+}
+
+function uploadMultipleFiles($files, $prefix = "Post", $folder = 'posts')
+{
+    $response = [];
     foreach ($files as $key => $file) {
-        $extension = $file->extension();
+        $filePath = uploadFile($file, $prefix, $folder, $key);
 
-        if (in_array($extension, $allowedExtensions)) {
-            $file_name = $pre .'_'. date("YmdHisu") . $key .'.'. $extension;
-            if ($path = $file->storeAs("public/{$folder}/", $file_name)) {
-                $file_info['name'] = $file_name;
-                $file_info['type'] = $extension;
-                $response[] = $file_info;
-            }
+        if ($filePath) {
+            $response[] = [
+                'file' => $filePath,
+                'type' => $file->extension()
+            ];
         } else {
-            return customResponse(false, "Only jpg, png, jpeg files are allowed");
+            return customResponse(false, "Error uploading files", 500);
         }
     }
     return customResponse(true, "Files uploaded successfully", 200, $response);
 }
 
-// format date from string
+function deleteMultipleFiles($media, $filesToKeep = [], $folderPath = '')
+{
+    foreach ($media as $file) {
+        $keepFile = collect($filesToKeep)->contains('id', $file->id);
+        
+        if (!$keepFile) {
+            deleteFile($folderPath . $file->file);
+            $file->delete();
+        }
+    }
+    return customResponse(true, "Files removed successfully");
+}
+
 function formatDate($str)
 {
     $date = new DateTime($str);
@@ -64,7 +85,6 @@ function formatDate($str)
     return $formatted;
 }
 
-// format time from string
 function formatTime($str)
 {
     $time = new DateTime($str);
@@ -72,7 +92,6 @@ function formatTime($str)
     return $formatted;
 }
 
-// send push notification
 function sendPushNotification($user, $title, $body, $id = 1)
 {
     if ($user->device_tokens->count() > 0){

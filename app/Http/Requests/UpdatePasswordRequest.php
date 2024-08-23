@@ -2,11 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
-
-class UpdatePasswordRequest extends FormRequest
+class UpdatePasswordRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,10 +24,5 @@ class UpdatePasswordRequest extends FormRequest
             'new_password' => 'required|min:8',
             'confirm_password' => 'required|same:new_password',
         ];
-    }
-    
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(apiResponse(false, $validator->errors()->first(), 422));
     }
 }
