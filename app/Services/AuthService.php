@@ -5,7 +5,8 @@ namespace App\Services;
 use App\Helpers\Constant;
 use App\Models\DeviceToken;
 use App\Models\User;
-// use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 
 class AuthService
 {
@@ -24,12 +25,11 @@ class AuthService
             'email' => $request->email,
             'password' => $request->password
         ])){
-            if(auth()->user()->status == Constant::INACTIVE){
-                return customResponse(false, "Your account is not active.", 422);
-                // throw new AccessDeniedHttpException("Your account is not active.");
+            if(auth()->user()->is_active == Constant::INACTIVE){
+                throw new AuthorizationException("Your account is not active.");
             }
             if(auth()->user()->role_id == Constant::ROLE_ADMIN){
-                return customResponse(false, "Invalid email or password.", 422);
+                throw new AuthenticationException("Invalid email or password.");
             }
 
             if ($request->device_id && $request->device_type) {
@@ -46,7 +46,7 @@ class AuthService
                 'access_token' => $token
             ]);
         }
-        return customResponse(false, "Invalid email or password.", 422);
+        throw new AuthenticationException("Invalid email or password.");
     }
 
     public function login_admin($request){
@@ -61,6 +61,6 @@ class AuthService
                 'access_token' => $token
             ]);
         }
-        return customResponse(false, "Invalid email or password.", 422); 
+        throw new AuthenticationException("Invalid email or password.");
     }
 }

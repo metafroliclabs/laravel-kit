@@ -5,15 +5,19 @@ namespace App\Exceptions;
 use Throwable;
 use Illuminate\Support\Facades\App;
 use Illuminate\Contracts\Container\Container;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use App\Services\JsonResponseService;
+
+// EXCEPTIONS
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\UnauthorizedException;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use App\Services\JsonResponseService;
+use Illuminate\Auth\Access\AuthorizationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -22,9 +26,7 @@ class Handler extends ExceptionHandler
      *
      * @var string[]
      */
-    protected $dontReport = [
-        // Add exception types here if you don't want them to be reported
-    ];
+    protected $dontReport = [];
 
     /**
      * A list of the inputs that are never flashed for validation exceptions.
@@ -52,8 +54,8 @@ class Handler extends ExceptionHandler
      */
     public function __construct(Container $container, JsonResponseService $jsonResponseService)
     {
-        $this->jsonResponseService = $jsonResponseService;
         parent::__construct($container);
+        $this->jsonResponseService = $jsonResponseService;
     }
 
     /**
@@ -64,7 +66,7 @@ class Handler extends ExceptionHandler
     public function register()
     {
         $this->reportable(function (Throwable $e) {
-            //
+            // Implement logging or reporting logic here if needed
         });
     }
 
@@ -77,32 +79,25 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        if ($request->is('api/*')) 
-        {
-            if (App::environment('local')) {
-                // Detailed error response for local environment
-                if ($exception instanceof ValidationException) {
-                    return parent::render($request, $exception);
-                }
+        if ($request->is('api/*')) {
+            $statusCode = $this->getStatusCodeFromException($exception);
 
-                $statusCode = $this->getStatusCodeFromException($exception);
-                return $this->jsonResponseService->fail([
-                    'message' => [
-                        'failed' => json_decode($exception->getMessage()) ?: $exception->getMessage(),
-                    ],
+            $responseData = [
+                'message' => $this->getErrorMessage($exception),
+            ];
+
+            if (App::environment('local')) {
+                $responseData = array_merge($responseData, [
                     'exception' => (new \ReflectionClass($exception))->getShortName(),
-                    'file'  => $exception->getFile(),
-                    "line"  => $exception->getLine(),
-                    'trace' => $exception->getTrace()
-                ], $statusCode);
-            } else {
-                // Standard error response for production environment
-                $statusCode = $this->getStatusCodeFromException($exception);
-                return $this->jsonResponseService->fail([
-                    'message' => ['failed' => $this->getErrorMessageFromException($exception)],
-                ], $statusCode);
+                    'file' => $exception->getFile(),
+                    'line' => $exception->getLine(),
+                    'trace' => $exception->getTrace(),
+                ]);
             }
+
+            return $this->jsonResponseService->fail($responseData, $statusCode);
         }
+
         return parent::render($request, $exception);
     }
 
@@ -114,66 +109,49 @@ class Handler extends ExceptionHandler
      */
     protected function getStatusCodeFromException(Throwable $exception): int
     {
-        if ($exception instanceof MethodNotAllowedHttpException) {
-            return Response::HTTP_METHOD_NOT_ALLOWED;
-        }
+        switch (true) {
+            case $exception instanceof InvalidTokenException:
+                return Response::HTTP_BAD_REQUEST;
 
-        if ($exception instanceof AuthenticationException) {
-            return Response::HTTP_UNAUTHORIZED;
-        }
+            case $exception instanceof AuthenticationException:
+                return Response::HTTP_UNAUTHORIZED;
 
-        if ($exception instanceof ModelNotFoundException) {
-            return Response::HTTP_NOT_FOUND;
-        }
+            case $exception instanceof UnauthorizedException:
+            case $exception instanceof AccessDeniedHttpException:
+            case $exception instanceof AuthorizationException:
+                return Response::HTTP_FORBIDDEN;
 
-        if ($exception instanceof NotFoundHttpException) {
-            return Response::HTTP_NOT_FOUND;
-        }
+            case $exception instanceof ModelNotFoundException:
+            case $exception instanceof NotFoundHttpException:
+                return Response::HTTP_NOT_FOUND;
 
-        if ($exception instanceof UnauthorizedException) {
-            return Response::HTTP_FORBIDDEN;
-        }
+            case $exception instanceof MethodNotAllowedHttpException:
+                return Response::HTTP_METHOD_NOT_ALLOWED;
 
-        if ($exception instanceof ValidationException) {
-            return Response::HTTP_UNPROCESSABLE_ENTITY;
-        }
+            case $exception instanceof ValidationException:
+                return Response::HTTP_UNPROCESSABLE_ENTITY;
 
-        // Default to Internal Server Error
-        return Response::HTTP_INTERNAL_SERVER_ERROR;
+            default:
+                return Response::HTTP_INTERNAL_SERVER_ERROR;
+        }
     }
 
     /**
      * Get the error message based on the exception type.
      *
      * @param Throwable $exception
-     * @return string
+     * @return array
      */
-    protected function getErrorMessageFromException(Throwable $exception): string
+    protected function getErrorMessage(Throwable $exception): array
     {
-        if ($exception instanceof MethodNotAllowedHttpException) {
-            return 'HTTP_METHOD_NOT_ALLOWED';
-        }
-
-        if ($exception instanceof AuthenticationException) {
-            return 'HTTP_UNAUTHORIZED';
-        }
-
-        if ($exception instanceof ModelNotFoundException) {
-            return 'MODEL_NOT_FOUND';
-        }
-
-        if ($exception instanceof NotFoundHttpException) {
-            return 'HTTP_NOT_FOUND';
-        }
-
-        if ($exception instanceof UnauthorizedException) {
-            return 'HTTP_FORBIDDEN';
-        }
-
         if ($exception instanceof ValidationException) {
-            return 'VALIDATION_ERROR';
+            $errors = $exception->errors();
+            $errorMessages = reset($errors)[0];
+            return ['failed' => $errorMessages];
         }
-        
-        return 'UNKNOWN_EXCEPTION';
+
+        return [
+            'failed' => json_decode($exception->getMessage(), true) ?: $exception->getMessage(),
+        ];
     }
 }

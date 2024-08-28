@@ -13,6 +13,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
+        'role_id',
         'first_name',
         'last_name',
         'email',
@@ -21,9 +22,8 @@ class User extends Authenticatable
         'avatar',
         // 'device_id',
         // 'device_type',
-        'role_id',
         'bio',
-        'status',
+        'is_active',
     ];
 
     protected $hidden = [
@@ -35,6 +35,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    // Relationships
+    public function role(){
+        return $this->belongsTo(Role::class);
+    }
 
     // Functions
     public function getUserByEmail($email){

@@ -67,8 +67,10 @@ class ProfileController extends Controller
         $user = $this->user->find(auth()->id());
         if($request->type == "read"){
             $notifications = $user->readNotifications()->paginate(10);
+
         }else if($request->type == "unread"){
             $notifications = $user->unreadNotifications()->paginate(10);
+            
         }else{
             $notifications = $user->notifications()->paginate(10);
         }
