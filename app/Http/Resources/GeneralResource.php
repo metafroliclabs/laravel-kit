@@ -22,10 +22,6 @@ class GeneralResource extends JsonResource
             $data = $this->validateUser($data);
         }
 
-        if (isset($data['notifiable_id'])) {
-            $data = $this->validateNotification($data);
-        }
-
         return $data;
     }
 
@@ -35,14 +31,6 @@ class GeneralResource extends JsonResource
         $data['user_email']  = $this->user->email;
         $data['user_avatar'] = $this->user->avatar;
         unset($data['user']);
-
-        return $data;
-    }
-
-    protected function validateNotification($data)
-    {
-        $data['time'] = $this->created_at->format('H:i');
-        $data['readable_time'] = $this->created_at->diffForHumans();
 
         return $data;
     }

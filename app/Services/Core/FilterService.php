@@ -1,19 +1,20 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Core;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class FilterService
 {
     private static $model;
-    private static $table;
+    // private static $table;
 
     private function __construct(Model $model)
     {
         self::$model = $model;
-        self::$table = $model->getTable(); // getting table name here
+        // self::$table = $model->getTable(); // getting table name here
     }
 
     public static function getInstance(Model $model)
@@ -40,7 +41,10 @@ class FilterService
 
     private static function filterByDate(array $values): void
     {
-        self::$model = self::$model->whereBetween(self::$table.'.created_at', $values);
+        $from = Carbon::parse($values[0])->startOfDay();
+        $to   = Carbon::parse($values[1])->endOfDay();
+
+        self::$model = self::$model->whereBetween('created_at', [$from, $to]);
     }
 
     private static function filterBySearch(string $search, $col): void
@@ -49,7 +53,7 @@ class FilterService
             return ($column === 'concat_name') ? DB::raw('concat(first_name, " ", last_name)') : $column;
         };
 
-        if (!is_null($col) && is_array($col) && !empty($col))
+        if (is_array($col) && !empty($col))
         {
             self::$model = self::$model->where(function ($query) use ($col, $search, $validateColumn) {
                 foreach ($col as $column)
@@ -86,7 +90,7 @@ class FilterService
     private static function filterByStatus($status, $col): void
     {
         $col_name = !is_null($col) ? $col : "is_active";
-        self::$model = self::$model->where(self::$table.'.'.$col_name, $status);
+        self::$model = self::$model->where($col_name, $status);
     }
 
     private static function filterBySort(string $sortBy): void

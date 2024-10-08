@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Core;
 
 use App\Helpers\Constant;
 use App\Models\DeviceToken;
@@ -17,7 +17,7 @@ class AuthService
         ]);
 
         $user = User::create($request->all());
-        return customResponse(true, "User created successfully.", 201, $user);
+        return $user;
     }
 
     public function login($request){

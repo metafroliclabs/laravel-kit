@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Exceptions\InvalidTokenException;
+use App\Exceptions\BadRequestException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ForgetPasswordRequest;
-use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\Common\ForgetPasswordRequest;
+use App\Http\Requests\Common\ResetPasswordRequest;
 use App\Models\PasswordReset;
 use App\Models\User;
 use App\Notifications\ForgetPasswordNotification;
@@ -39,12 +39,12 @@ class ForgetPasswordController extends Controller
         if ($code) {
             return apiResponse(true, 'Code has been verified successfully.');
         }
-        throw new InvalidTokenException();
+        throw new BadRequestException("Invalid code, try again");
     }
 
     public function reset(ResetPasswordRequest $request)
     {
-        $data     = $this->passwordReset->email($request->email)->first();
+        // $data     = $this->passwordReset->email($request->email)->first();
         $response = $this->user->resetPassword($request);
         $delete   = $this->passwordReset->email($request->email)->delete();
         return apiResponse(...$response);

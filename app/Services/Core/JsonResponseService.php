@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Core;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Mockery\Exception;

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ContactUsRequest;
+use App\Http\Requests\Common\ContactUsRequest;
 use App\Models\ContactUs;
 use App\Models\Page;
 use Illuminate\Http\Request;

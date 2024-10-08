@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use App\Services\JsonResponseService;
+use App\Services\Core\JsonResponseService;
 
 // EXCEPTIONS
 use Illuminate\Auth\AuthenticationException;
@@ -110,7 +110,7 @@ class Handler extends ExceptionHandler
     protected function getStatusCodeFromException(Throwable $exception): int
     {
         switch (true) {
-            case $exception instanceof InvalidTokenException:
+            case $exception instanceof BadRequestException:
                 return Response::HTTP_BAD_REQUEST;
 
             case $exception instanceof AuthenticationException:

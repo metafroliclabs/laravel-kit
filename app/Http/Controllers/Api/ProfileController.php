@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdatePasswordRequest;
-use App\Http\Requests\UpdateUserRequest;
-use App\Http\Resources\GeneralResource;
+use App\Http\Requests\Common\UpdatePasswordRequest;
+use App\Http\Requests\Common\UpdateUserRequest;
+use App\Http\Resources\DefaultResource;
 use App\Http\Resources\ProfileResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -27,8 +27,8 @@ class ProfileController extends Controller
     public function edit_profile(UpdateUserRequest $request){
         $user = $this->user->find(auth()->id());
         if ($request->image) {
-            $avatar = uploadFile($request->image);
-            $request->merge(['avatar' => $avatar]);
+            $data = uploadFile($request->image);
+            $request->merge(['avatar' => $data['data']]);
         }
         $user->update($request->all());
         return apiResponse(true, "Profile updated successfully.", 200, $user);
@@ -74,7 +74,7 @@ class ProfileController extends Controller
         }else{
             $notifications = $user->notifications()->paginate(10);
         }
-        return apiResponse(true, "Notifications", 200, GeneralResource::collection($notifications)->response()->getData(true));
+        return apiResponse(true, "Notifications", 200, DefaultResource::collection($notifications)->response()->getData(true));
     }
 
     public function mark_as_read($id){

@@ -3,6 +3,7 @@
 use App\Helpers\Constant;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 function apiResponse($status, $message, $http = 200, $data = null)
 {
@@ -26,14 +27,25 @@ function customResponse($status, $msg, $http = 200, $data = [])
 
 function generateFilename($prefix, $extension, $key)
 {
-    return $prefix . '_' . date("YmdHis") . $key . '.' . $extension;
+    $datetime = date("YmdHis");
+    return sprintf('%s_%s_%d.%s', $prefix, $datetime, $key, $extension);
 }
 
 function uploadFile($file, $prefix = "Img", $folder = "upload", $key = 0)
 {
+    $directory = "public/{$folder}/";
+
+    if (!Storage::exists($directory)) {
+        Storage::makeDirectory($directory, 0755, true);
+    }
+    
     $filename = generateFilename($prefix, $file->extension(), $key);
-    $path = $file->storeAs("public/{$folder}/", $filename);
-    return $path ? "storage/{$folder}/{$filename}" : null;
+    $path = $file->storeAs($directory, $filename);
+
+    if ($path) {
+        return ['status' => true, 'data' => "storage/{$folder}/{$filename}"];
+    }
+    throw new Exception("File could not upload");
 }
 
 function deleteFile($file)
@@ -44,25 +56,23 @@ function deleteFile($file)
             File::delete($filePath);
         }
     }
-    return true;
+    return ['status' => true];
 }
 
 function uploadMultipleFiles($files, $prefix = "Post", $folder = 'posts')
 {
     $response = [];
     foreach ($files as $key => $file) {
-        $filePath = uploadFile($file, $prefix, $folder, $key);
+        $uploadedFile = uploadFile($file, $prefix, $folder, $key);
 
-        if ($filePath) {
+        if ($uploadedFile['status']) {
             $response[] = [
-                'file' => $filePath,
+                'file' => $uploadedFile['data'],
                 'type' => $file->extension()
             ];
-        } else {
-            return customResponse(false, "Error uploading files", 500);
         }
     }
-    return customResponse(true, "Files uploaded successfully", 200, $response);
+    return ['status' => true, 'data' => $response];
 }
 
 function deleteMultipleFiles($media, $filesToKeep = [], $folderPath = '')
@@ -72,10 +82,10 @@ function deleteMultipleFiles($media, $filesToKeep = [], $folderPath = '')
         
         if (!$keepFile) {
             deleteFile($folderPath . $file->file);
-            $file->delete();
+            // $file->delete();
         }
     }
-    return customResponse(true, "Files removed successfully");
+    return ['status' => true, 'message' => "Files removed successfully"];
 }
 
 function formatDate($str)

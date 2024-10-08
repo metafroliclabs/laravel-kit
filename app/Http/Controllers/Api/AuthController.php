@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\SignupRequest;
+use App\Http\Requests\Common\LoginRequest;
+use App\Http\Requests\Common\SignupRequest;
 use App\Models\DeviceToken;
-use App\Services\AuthService;
+use App\Services\Core\AuthService;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -21,8 +21,8 @@ class AuthController extends Controller
     public function signup(SignupRequest $request)
     {
         if ($request->image) {
-            $avatar = uploadFile($request->image);
-            $request->merge(['avatar' => $avatar]);
+            $data = uploadFile($request->image);
+            $request->merge(['avatar' => $data['data']]);
         }
 
         $response = $this->authService->create($request);
