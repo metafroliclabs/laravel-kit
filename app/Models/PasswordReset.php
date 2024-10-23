@@ -16,15 +16,13 @@ class PasswordReset extends Model
     }
 
     public function saveCode($email, $code){
-        $this->updateOrInsert([
+        return $this->updateOrInsert([
             'email' => $email,
         ],[
             'email' => $email,
             'token' => $code,
             'created_at' => now(),
         ]);
-
-        return customResponse(true, "We have sent you a 6 digit code on your email!");
     }
 
     // SCOPES

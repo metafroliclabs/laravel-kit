@@ -28,7 +28,7 @@ function customResponse($status, $msg, $http = 200, $data = [])
 function generateFilename($prefix, $extension, $key)
 {
     $datetime = date("YmdHis");
-    return sprintf('%s_%s_%d.%s', $prefix, $datetime, $key, $extension);
+    return sprintf('%s_%s%d.%s', $prefix, $datetime, $key, $extension);
 }
 
 function uploadFile($file, $prefix = "Img", $folder = "upload", $key = 0)

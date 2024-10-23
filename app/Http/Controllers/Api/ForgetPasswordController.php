@@ -30,7 +30,7 @@ class ForgetPasswordController extends Controller
         $message = $this->passwordReset->saveCode($request->email, $code);
 
         $user->notify(new ForgetPasswordNotification($code));
-        return apiResponse(...$message);
+        return apiResponse(true, "We have sent you a 6 digit code on your email!");
     }
 
     public function verify(Request $request)
@@ -47,6 +47,6 @@ class ForgetPasswordController extends Controller
         // $data     = $this->passwordReset->email($request->email)->first();
         $response = $this->user->resetPassword($request);
         $delete   = $this->passwordReset->email($request->email)->delete();
-        return apiResponse(...$response);
+        return apiResponse(true, "Password reset successfully.");
     }
 }

@@ -11,13 +11,7 @@ use Illuminate\Auth\AuthenticationException;
 class AuthService
 {
     public function create($request){
-        $request->merge([
-            'password' => bcrypt($request->password),
-            'role_id'  => Constant::ROLE_USER
-        ]);
-
-        $user = User::create($request->all());
-        return $user;
+        return User::create($request->all());
     }
 
     public function login($request){
@@ -28,7 +22,7 @@ class AuthService
             if(auth()->user()->is_active == Constant::INACTIVE){
                 throw new AuthorizationException("Your account is not active.");
             }
-            if(auth()->user()->role_id == Constant::ROLE_ADMIN){
+            if(auth()->user()->role == Constant::ADMIN){
                 throw new AuthenticationException("Invalid email or password.");
             }
 
@@ -41,10 +35,10 @@ class AuthService
             }
 
             $token = $request->user()->createToken('main')->plainTextToken;
-            return customResponse(true, "login successfull!", 200, [
+            return [
                 'user' => auth()->user(),
                 'access_token' => $token
-            ]);
+            ];
         }
         throw new AuthenticationException("Invalid email or password.");
     }
@@ -53,13 +47,13 @@ class AuthService
         if(auth()->attempt([
             'email'    => $request->email,
             'password' => $request->password,
-            'role_id'  => Constant::ROLE_ADMIN
+            'role'     => Constant::ADMIN
         ])){
             $token = $request->user()->createToken('main')->plainTextToken;
-            return customResponse(true, "login successfull!", 200, [
+            return [
                 'user' => User::find(auth()->id()),
                 'access_token' => $token
-            ]);
+            ];
         }
         throw new AuthenticationException("Invalid email or password.");
     }

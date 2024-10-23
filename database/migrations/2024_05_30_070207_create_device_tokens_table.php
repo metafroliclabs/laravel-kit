@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('device_tokens', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('device_id');
             $table->string('device_type');
             $table->timestamps();

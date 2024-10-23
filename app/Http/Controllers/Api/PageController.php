@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Common\ContactUsRequest;
-use App\Models\ContactUs;
+use App\Http\Requests\Common\FeedbackRequest;
+use App\Models\Feedback;
 use App\Models\Page;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
-    public function contact_us(ContactUsRequest $request){
-        $data = ContactUs::create($request->all());
+    public function contact_us(FeedbackRequest $request){
+        $data = Feedback::create($request->all());
         return apiResponse(true, "Message sent successfully.");
     }
 

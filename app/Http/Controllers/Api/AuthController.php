@@ -25,20 +25,20 @@ class AuthController extends Controller
             $request->merge(['avatar' => $data['data']]);
         }
 
-        $response = $this->authService->create($request);
+        $user = $this->authService->create($request);
         return apiResponse(true, "Profile has been created successfully.");
     }
 
     public function login(LoginRequest $request)
     {
-        $response = $this->authService->login($request);
-        return apiResponse(...$response);
+        $data = $this->authService->login($request);
+        return apiResponse(true, "login successfull", 200, $data);
     }
 
     public function login_admin(LoginRequest $request)
     {
-        $response = $this->authService->login_admin($request);
-        return apiResponse(...$response);
+        $data = $this->authService->login_admin($request);
+        return apiResponse(true, "login successfull", 200, $data);
     }
 
     public function logout(Request $request)

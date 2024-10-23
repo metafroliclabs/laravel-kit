@@ -13,7 +13,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'role_id',
+        'role',
         'first_name',
         'last_name',
         'email',
@@ -37,9 +37,6 @@ class User extends Authenticatable
     ];
 
     // Relationships
-    public function role(){
-        return $this->belongsTo(Role::class);
-    }
 
     // Functions
     public function getUserByEmail($email){
@@ -50,7 +47,5 @@ class User extends Authenticatable
         $user = $this->getUserByEmail($request->email);
         $user->password = bcrypt($request->password);
         $user->save();
-        
-        return customResponse(true, "Password reset successfully.");
     }
 }
