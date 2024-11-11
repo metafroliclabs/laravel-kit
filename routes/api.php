@@ -39,8 +39,11 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-profile', 'profile');
         Route::post('/edit-profile', 'edit_profile');
         Route::post('/change-password', 'change_password');
+        // Route::post('/change-avatar', 'change_avatar');
         Route::get('/get-notifications', 'notifications');
+        Route::get('/get-notifications-count', 'notifications_count');
         Route::get('/mark-as-read/{id}', 'mark_as_read');
+        Route::get('/mark-all-as-read', 'mark_all_as_read');
     });
 
     Route::controller(PageController::class)->group(function(){

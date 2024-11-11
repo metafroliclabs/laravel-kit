@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\MainController;
 use App\Http\Requests\Common\LoginRequest;
 use App\Http\Requests\Common\SignupRequest;
 use App\Models\DeviceToken;
 use App\Services\Core\AuthService;
 use Illuminate\Http\Request;
 
-class AuthController extends Controller
+class AuthController extends MainController
 {
     public $authService;
 
     public function __construct(AuthService $authService)
     {
+        parent::__construct();
         $this->authService = $authService;
     }
 
@@ -26,19 +27,19 @@ class AuthController extends Controller
         }
 
         $user = $this->authService->create($request);
-        return apiResponse(true, "Profile has been created successfully.");
+        return $this->response->successMessage("Profile has been created successfully.");
     }
 
     public function login(LoginRequest $request)
     {
         $data = $this->authService->login($request);
-        return apiResponse(true, "login successfull", 200, $data);
+        return $this->response->success($data);
     }
 
     public function login_admin(LoginRequest $request)
     {
         $data = $this->authService->login_admin($request);
-        return apiResponse(true, "login successfull", 200, $data);
+        return $this->response->success($data);
     }
 
     public function logout(Request $request)
@@ -47,6 +48,6 @@ class AuthController extends Controller
             DeviceToken::where('user_id', auth()->id())->where('device_id', $request->device_id)->delete();
         }
         $request->user()->currentAccessToken()->delete();
-        return apiResponse(true, "logout successfully!");
+        return $this->response->successMessage("logout successfully!");
     }
 }

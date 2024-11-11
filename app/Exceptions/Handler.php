@@ -89,8 +89,8 @@ class Handler extends ExceptionHandler
             if (App::environment('local')) {
                 $responseData = array_merge($responseData, [
                     'exception' => (new \ReflectionClass($exception))->getShortName(),
-                    'file' => $exception->getFile(),
-                    'line' => $exception->getLine(),
+                    'file'  => $exception->getFile(),
+                    'line'  => $exception->getLine(),
                     'trace' => $exception->getTrace(),
                 ]);
             }
@@ -148,6 +148,13 @@ class Handler extends ExceptionHandler
             $errors = $exception->errors();
             $errorMessages = reset($errors)[0];
             return ['failed' => $errorMessages];
+        }
+
+        if ($exception instanceof ModelNotFoundException) {
+            $modelName = class_basename($exception->getModel());
+            $ids = $exception->getIds();
+
+            return ['failed' => "Invalid ID($ids[0]), $modelName object not found"];
         }
 
         return [

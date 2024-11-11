@@ -5,15 +5,15 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
-function apiResponse($status, $message, $http = 200, $data = null)
-{
-    $response['status'] = $status;
-    $response['message'] = $message;
-    if (!is_null($data) && !empty($data)) {
-        $response['data'] = $data;
-    }
-    return response()->json($response, $http);
-}
+// function apiResponse($status, $message, $http = 200, $data = null)
+// {
+//     $response['status'] = $status;
+//     $response['message'] = $message;
+//     if (!is_null($data) && !empty($data)) {
+//         $response['data'] = $data;
+//     }
+//     return response()->json($response, $http);
+// }
 
 function customResponse($status, $msg, $http = 200, $data = [])
 {

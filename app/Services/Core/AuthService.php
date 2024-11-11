@@ -22,6 +22,7 @@ class AuthService
             if(auth()->user()->is_active == Constant::INACTIVE){
                 throw new AuthorizationException("Your account is not active.");
             }
+            
             if(auth()->user()->role == Constant::ADMIN){
                 throw new AuthenticationException("Invalid email or password.");
             }

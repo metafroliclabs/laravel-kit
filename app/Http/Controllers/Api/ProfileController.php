@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Exceptions\BadRequestException;
+use App\Http\Controllers\MainController;
 use App\Http\Requests\Common\UpdatePasswordRequest;
 use App\Http\Requests\Common\UpdateUserRequest;
 use App\Http\Resources\DefaultResource;
@@ -11,17 +12,18 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class ProfileController extends Controller
+class ProfileController extends MainController
 {
     public $user;
 
     public function __construct(User $user)
     {
+        parent::__construct();
         $this->user = $user;
     }
 
     public function profile(){
-        return apiResponse(true, "Profile Data", 200, new ProfileResource(auth()->user()));
+        return $this->response->success(new ProfileResource(auth()->user()));
     }
 
     public function edit_profile(UpdateUserRequest $request){
@@ -29,9 +31,10 @@ class ProfileController extends Controller
         if ($request->image) {
             $data = uploadFile($request->image);
             $request->merge(['avatar' => $data['data']]);
+            deleteFile($user->avatar);
         }
         $user->update($request->all());
-        return apiResponse(true, "Profile updated successfully.", 200, $user);
+        return $this->response->success($user);
     }
 
     public function change_password(UpdatePasswordRequest $request){
@@ -41,10 +44,9 @@ class ProfileController extends Controller
                 'password' => Hash::make($request->new_password)
             ])->save();
         
-            return apiResponse(true, "Password changed successfully.");
-        }else{
-            return apiResponse(false, "Password don't match.", 422);
+            return $this->response->successMessage("Password changed successfully.");
         }
+        throw new BadRequestException("Current password is invalid.");
     }
 
     // public function change_avatar(UpdateAvatarRequest $request){
@@ -74,14 +76,39 @@ class ProfileController extends Controller
         }else{
             $notifications = $user->notifications()->paginate(10);
         }
-        return apiResponse(true, "Notifications", 200, DefaultResource::collection($notifications)->response()->getData(true));
+        return $this->response->success(
+            DefaultResource::collection($notifications)->response()->getData(true)
+        );
+    }
+
+    public function notifications_count()
+    {
+        $user  = $this->user->find(auth()->id());
+        $count = $user->notifications()->whereNull('read_at')->count();
+        return $this->response->success(['count' => $count]);
     }
 
     public function mark_as_read($id){
-        $notification = auth()->user()->unreadNotifications->where('id', $id)->first();
-        if($notification) {
-            $notification->markAsRead();
+        $user = $this->user->find(auth()->id());
+        $notification = $user->notifications()->where('id', $id)->first();
+
+        if ($notification) {
+            if ($notification->read_at) {
+                $notification->update(['read_at' => null]);
+                return $this->response->successMessage("Notification marked as unread");
+
+            } else {
+                $notification->markAsRead();
+                return $this->response->successMessage("Notification marked as read");
+            }
         }
-        return apiResponse(true, "marked as read");
+        throw new BadRequestException("Notification not found");
+    }
+    
+    public function mark_all_as_read()
+    {
+        $user = $this->user->find(auth()->id());
+        $user->unreadNotifications()->update(['read_at' => now()]);
+        return $this->response->successMessage("All notifications marked as read.");
     }
 }

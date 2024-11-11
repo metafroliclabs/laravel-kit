@@ -31,7 +31,8 @@ class JsonResponseService
      */
     public function successMessage($message = 'Success', $code = Response::HTTP_OK)
     {
-        return response()->json(['status' => 'success', 'message' => $message], $code);
+        return $this->putAdditionalMeta(['message' => $message], true)->response()->setStatusCode($code);
+        // return response()->json(['status' => true, 'message' => $message], $code);
     }
 
     /**
