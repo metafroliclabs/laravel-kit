@@ -31,7 +31,7 @@ class ProfileController extends MainController
         if ($request->image) {
             $data = uploadFile($request->image);
             $request->merge(['avatar' => $data['data']]);
-            deleteFile($user->avatar);
+            deleteFile($user->getAttributes()['avatar']);
         }
         $user->update($request->all());
         return $this->response->success($user);

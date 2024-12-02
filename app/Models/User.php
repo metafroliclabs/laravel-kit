@@ -39,13 +39,21 @@ class User extends Authenticatable
     // Relationships
 
     // Functions
-    public function getUserByEmail($email){
+    public function getUserByEmail($email)
+    {
         return $this->where('email', $email)->first();
     }
 
-    public function resetPassword($request){
+    public function resetPassword($request)
+    {
         $user = $this->getUserByEmail($request->email);
         $user->password = bcrypt($request->password);
         $user->save();
+    }
+
+    // Accessors
+    public function getAvatarAttribute($value) 
+    {
+        return $value ? asset($value) : null;
     }
 }
