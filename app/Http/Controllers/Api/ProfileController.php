@@ -9,7 +9,6 @@ use App\Http\Requests\Common\UpdateUserRequest;
 use App\Http\Resources\DefaultResource;
 use App\Http\Resources\ProfileResource;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends MainController
@@ -22,11 +21,13 @@ class ProfileController extends MainController
         $this->user = $user;
     }
 
-    public function profile(){
+    public function profile()
+    {
         return $this->response->success(new ProfileResource(auth()->user()));
     }
 
-    public function edit_profile(UpdateUserRequest $request){
+    public function edit_profile(UpdateUserRequest $request)
+    {
         $user = $this->user->find(auth()->id());
         if ($request->image) {
             $data = uploadFile($request->image);
@@ -37,13 +38,14 @@ class ProfileController extends MainController
         return $this->response->success($user);
     }
 
-    public function change_password(UpdatePasswordRequest $request){
+    public function change_password(UpdatePasswordRequest $request)
+    {
         $user = $this->user->find(auth()->id());
-        if(Hash::check($request->old_password, $user->password)){ 
+        if (Hash::check($request->old_password, $user->password)) {
             $user->fill([
                 'password' => Hash::make($request->new_password)
             ])->save();
-        
+
             return $this->response->successMessage("Password changed successfully.");
         }
         throw new BadRequestException("Current password is invalid.");
@@ -65,38 +67,52 @@ class ProfileController extends MainController
     //     return apiResponse(false, "Image couldn't upload.", 422);
     // }
 
-    public function notifications(Request $request){
+    public function all_notifications()
+    {
         $user = $this->user->find(auth()->id());
-        if($request->type == "read"){
-            $notifications = $user->readNotifications()->paginate(10);
+        $notifications = $user->notifications()->paginate(10);
 
-        }else if($request->type == "unread"){
-            $notifications = $user->unreadNotifications()->paginate(10);
-            
-        }else{
-            $notifications = $user->notifications()->paginate(10);
-        }
         return $this->response->success(
             DefaultResource::collection($notifications)->response()->getData(true)
         );
     }
 
-    public function notifications_count()
+    public function read_notifications()
+    {
+        $user = $this->user->find(auth()->id());
+        $notifications = $user->readNotifications()->paginate(10);
+
+        return $this->response->success(
+            DefaultResource::collection($notifications)->response()->getData(true)
+        );
+    }
+
+    public function unread_notifications()
+    {
+        $user = $this->user->find(auth()->id());
+        $notifications = $user->unreadNotifications()->paginate(10);
+
+        return $this->response->success(
+            DefaultResource::collection($notifications)->response()->getData(true)
+        );
+    }
+
+    public function unread_notifications_count()
     {
         $user  = $this->user->find(auth()->id());
         $count = $user->notifications()->whereNull('read_at')->count();
         return $this->response->success(['count' => $count]);
     }
 
-    public function mark_as_read($id){
+    public function mark_notification($id)
+    {
         $user = $this->user->find(auth()->id());
-        $notification = $user->notifications()->where('id', $id)->first();
+        $notification = $user->notifications()->find($id);
 
         if ($notification) {
             if ($notification->read_at) {
                 $notification->update(['read_at' => null]);
                 return $this->response->successMessage("Notification marked as unread");
-
             } else {
                 $notification->markAsRead();
                 return $this->response->successMessage("Notification marked as read");
@@ -104,7 +120,7 @@ class ProfileController extends MainController
         }
         throw new BadRequestException("Notification not found");
     }
-    
+
     public function mark_all_as_read()
     {
         $user = $this->user->find(auth()->id());

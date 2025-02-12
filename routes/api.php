@@ -40,10 +40,12 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/edit-profile', 'edit_profile');
         Route::post('/change-password', 'change_password');
         // Route::post('/change-avatar', 'change_avatar');
-        Route::get('/get-notifications', 'notifications');
-        Route::get('/get-notifications-count', 'notifications_count');
-        Route::get('/mark-as-read/{id}', 'mark_as_read');
-        Route::get('/mark-all-as-read', 'mark_all_as_read');
+        Route::get('/notifications/all/list', 'all_notifications');
+        Route::get('/notifications/read/list', 'read_notifications');
+        Route::get('/notifications/unread/list', 'unread_notifications');
+        Route::get('/notifications/unread/count', 'unread_notifications_count');
+        Route::post('/mark-notification/{id}', 'mark_notification');
+        Route::post('/mark-all-as-read', 'mark_all_as_read');
     });
 
     Route::controller(PageController::class)->group(function(){
