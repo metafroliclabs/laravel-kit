@@ -8,7 +8,7 @@ This project provides a starter boilerplate for Laravel applications with essent
 
 1. **Create a new project using Composer:**
    ```bash
-   composer create-project mfl/laravel-kit
+   composer create-project metafroliclabs/laravel-kit
    ```
 
 2. **Setup environment:**
