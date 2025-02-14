@@ -12,25 +12,19 @@ This project provides a starter boilerplate for Laravel applications with essent
    ```
 
 2. **Setup environment:**
-   - Copy the `.env.example` file to `.env`.
    - Configure database and application settings.
 
-3. **Generate application key:**
-   ```bash
-   php artisan key:generate
-   ```
-
-4. **Run migrations:**
+3. **Run migrations:**
    ```bash
    php artisan migrate
    ```
 
-5. **Install Passport (if required for Sanctum):**
+4. **Install Passport (if required for Sanctum):**
    ```bash
    php artisan passport:install
    ```
 
-6. **Start the application:**
+5. **Start the application:**
    ```bash
    php artisan serve
    ```
