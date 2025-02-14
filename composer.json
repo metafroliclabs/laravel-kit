@@ -1,7 +1,7 @@
 {
-    "name": "Laravel",
+    "name": "metafroliclabs/laravel-kit",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "This project provides a starter boilerplate for Laravel applications with essential authentication, profile management, and content page routes.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
@@ -65,6 +65,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }
