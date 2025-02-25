@@ -22,20 +22,20 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::controller(AuthController::class)->group(function(){
+Route::controller(AuthController::class)->group(function () {
     Route::post('/signup', 'signup');
     Route::post('/login', 'login');
     Route::post('/logout', 'logout')->middleware('auth:sanctum');
 });
 
-Route::controller(ForgetPasswordController::class)->group(function(){
+Route::controller(ForgetPasswordController::class)->group(function () {
     Route::post('/forget-password', 'forgot');
     Route::post('/verify-code', 'verify');
     Route::post('/set-password', 'reset');
 });
 
-Route::middleware('auth:sanctum')->group(function(){
-    Route::controller(ProfileController::class)->group(function(){
+Route::middleware('auth:sanctum')->group(function () {
+    Route::controller(ProfileController::class)->group(function () {
         Route::get('/get-profile', 'profile');
         Route::post('/edit-profile', 'edit_profile');
         Route::post('/change-password', 'change_password');
@@ -48,7 +48,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/mark-all-as-read', 'mark_all_as_read');
     });
 
-    Route::controller(PageController::class)->group(function(){
+    Route::controller(PageController::class)->group(function () {
         Route::post('/contact-us', 'contact_us');
         Route::get('/content', 'get_page');
     });
