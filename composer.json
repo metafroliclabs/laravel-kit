@@ -2,11 +2,12 @@
     "name": "metafroliclabs/laravel-kit",
     "type": "project",
     "description": "This project provides a starter boilerplate for Laravel applications with essential authentication, profile management, and content page routes.",
-    "keywords": ["laravel", "framework"],
+    "keywords": ["laravel", "framework", "boilerplate"],
     "license": "MIT",
     "require": {
         "php": "^8.1",
         "guzzlehttp/guzzle": "^7.2",
+        "kreait/firebase-php": "^7.16",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",

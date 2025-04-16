@@ -17,13 +17,15 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'email',
+        'country_code',
+        'dial_code',
         'phone',
         'password',
         'avatar',
         // 'device_id',
         // 'device_type',
-        'bio',
         'is_active',
+        'status',
     ];
 
     protected $hidden = [

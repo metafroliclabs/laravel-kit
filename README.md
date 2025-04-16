@@ -51,17 +51,17 @@ This project provides a starter boilerplate for Laravel applications with essent
 
 ### Profile Management (Protected)
 
-| Method | Endpoint                       | Controller       | Description                       |
-|--------|--------------------------------|------------------|-----------------------------------|
+| Method | Endpoint                       | Controller        | Description                       |
+|--------|--------------------------------|-------------------|-----------------------------------|
 | GET    | `/get-profile`                 | ProfileController | Get user profile                  |
 | POST   | `/edit-profile`                | ProfileController | Edit user profile                 |
-| POST   | `/change-password`            | ProfileController | Change password                   |
+| POST   | `/change-password`             | ProfileController | Change password                   |
 | GET    | `/notifications/all/list`      | ProfileController | List all notifications            |
 | GET    | `/notifications/read/list`     | ProfileController | List read notifications           |
 | GET    | `/notifications/unread/list`   | ProfileController | List unread notifications         |
 | GET    | `/notifications/unread/count`  | ProfileController | Get unread notification count     |
-| POST   | `/mark-notification/{id}`      | ProfileController | Mark a single notification as read/unread|
-| POST   | `/mark-all-as-read`            | ProfileController | Mark all notifications as read    |
+| POST   | `/notifications/{id}`          | ProfileController | Mark a single notification as read/unread|
+| POST   | `/notifications/read`          | ProfileController | Mark all notifications as read    |
 
 *All routes require `auth:sanctum` middleware.*
 

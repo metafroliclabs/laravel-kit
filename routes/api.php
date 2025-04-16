@@ -44,8 +44,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/notifications/read/list', 'read_notifications');
         Route::get('/notifications/unread/list', 'unread_notifications');
         Route::get('/notifications/unread/count', 'unread_notifications_count');
-        Route::post('/mark-notification/{id}', 'mark_notification');
-        Route::post('/mark-all-as-read', 'mark_all_as_read');
+        Route::post('/notifications/{id}', 'mark_notification');
+        Route::post('/notifications/read', 'mark_all_as_read');
     });
 
     Route::controller(PageController::class)->group(function () {

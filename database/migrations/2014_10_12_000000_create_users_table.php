@@ -18,14 +18,16 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();
+            $table->string('country_code')->nullable();
+            $table->string('dial_code')->nullable();
             $table->string('phone')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('avatar')->default(Constant::DEFAULT_AVATAR);
             // $table->string('device_id')->nullable();
             // $table->string('device_type')->nullable();
-            $table->text('bio')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->string('status');
             $table->rememberToken();
             $table->timestamps();
         });

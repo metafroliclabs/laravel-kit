@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Core;
 
 use App\Exceptions\BadRequestException;
 use Illuminate\Support\Facades\Cache;

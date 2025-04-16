@@ -28,16 +28,23 @@ class AuthService
             }
 
             if ($request->device_id && $request->device_type) {
-                DeviceToken::create([
-                    'user_id'     => auth()->id(),
+                DeviceToken::updateOrCreate([
+                    'user_id'     => auth()->id()
+                ], [
                     'device_id'   => $request->device_id,
                     'device_type' => $request->device_type
                 ]);
             }
 
             $token = $request->user()->createToken('main')->plainTextToken;
+            $user = User::find(auth()->id());
+
+            // if ($request->device_id && $request->device_type) {
+            //     $user->update($request->only('device_id', 'device_type'));
+            // }
+
             return [
-                'user' => auth()->user(),
+                'user' => $user,
                 'access_token' => $token
             ];
         }
