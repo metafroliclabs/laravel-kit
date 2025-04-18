@@ -15,15 +15,15 @@ use Illuminate\Support\Facades\Storage;
 //     return response()->json($response, $http);
 // }
 
-function customResponse($status, $msg, $http = 200, $data = [])
-{
-    return [
-        'status' => $status,
-        'message' => $msg,
-        'http' => $http,
-        'data' => $data,
-    ];
-}
+// function customResponse($status, $msg, $http = 200, $data = [])
+// {
+//     return [
+//         'status' => $status,
+//         'message' => $msg,
+//         'http' => $http,
+//         'data' => $data,
+//     ];
+// }
 
 function generateFilename($prefix, $extension, $key)
 {

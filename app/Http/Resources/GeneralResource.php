@@ -15,23 +15,17 @@ class GeneralResource extends JsonResource
     public function toArray(Request $request): array
     {
         $data = parent::toArray($request);
-        $data['created_at'] = $this->created_at->format('Y-m-d');
-        unset($data['updated_at']);
-
-        if (isset($data['user'])) {
-            $data = $this->validateUser($data);
+    
+        if (!empty($data['image'])) {
+            $data['image'] = asset($data['image']);
         }
-
-        return $data;
-    }
-
-    protected function validateUser($data)
-    {
-        $data['user_name']   = $this->user->name;
-        $data['user_email']  = $this->user->email;
-        $data['user_avatar'] = $this->user->avatar;
-        unset($data['user']);
-
+    
+        if (!empty($data['file'])) {
+            $data['file'] = asset($data['file']);
+        }
+    
+        unset($data['updated_at']);
+    
         return $data;
     }
 }

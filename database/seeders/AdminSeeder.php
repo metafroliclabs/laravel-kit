@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Helpers\Constant;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,11 +14,12 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         $admin = [
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john@mailinator.com',
-            'password' => bcrypt('password'),
-            'role_id' => 1,
+            'role' => Constant::ADMIN,
+            'first_name' => 'Lewis',
+            'last_name' => 'Hamilton',
+            'email' => 'lewis@mailinator.com',
+            'password' => bcrypt('12345678'),
+            'status' => Constant::APPROVED
         ];
 
         \App\Models\User::create($admin);
