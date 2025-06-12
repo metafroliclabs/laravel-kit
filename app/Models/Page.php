@@ -10,6 +10,17 @@ class Page extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'slug', 'content'
+        'name',
+        'slug',
+        'title',
+        'photo',
+        'description',
+        'status',
     ];
+
+    // Accessors
+    public function getPhotoAttribute($value)
+    {
+        return $value ? asset($value) : null;
+    }
 }

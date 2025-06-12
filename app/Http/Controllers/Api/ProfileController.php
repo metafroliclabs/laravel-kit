@@ -35,7 +35,7 @@ class ProfileController extends MainController
             deleteFile($user->getAttributes()['avatar']);
         }
         $user->update($request->all());
-        return $this->response->success($user);
+        return $this->response->success(new ProfileResource($user));
     }
 
     public function change_password(UpdatePasswordRequest $request)

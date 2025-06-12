@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Helpers\Constant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -39,6 +41,10 @@ class User extends Authenticatable
     ];
 
     // Relationships
+    public function deviceToken()
+    {
+        return $this->hasOne(DeviceToken::class);
+    }
 
     // Functions
     public function getUserByEmail($email)
@@ -57,5 +63,11 @@ class User extends Authenticatable
     public function getAvatarAttribute($value) 
     {
         return $value ? asset($value) : null;
+    }
+
+    // Scopes
+    public function scopeWhereRole($query, $role)
+    {
+        return $query->where('role', $role);
     }
 }

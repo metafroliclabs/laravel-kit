@@ -44,9 +44,9 @@ class AuthController extends MainController
 
     public function logout(Request $request)
     {
-        if ($request->device_id) {
-            DeviceToken::where('user_id', auth()->id())->where('device_id', $request->device_id)->delete();
-        }
+        // if ($request->device_id) {
+        //     DeviceToken::where('user_id', auth()->id())->where('device_id', $request->device_id)->delete();
+        // }
         $request->user()->currentAccessToken()->delete();
         return $this->response->successMessage("logout successfully!");
     }

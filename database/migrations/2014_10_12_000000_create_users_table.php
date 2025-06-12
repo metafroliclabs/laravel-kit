@@ -27,7 +27,7 @@ return new class extends Migration
             // $table->string('device_id')->nullable();
             // $table->string('device_type')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->string('status')->default(Constant::PENDING);
+            $table->enum('status', [Constant::PENDING, Constant::APPROVED, Constant::REJECTED])->default(Constant::APPROVED);
             $table->rememberToken();
             $table->timestamps();
         });

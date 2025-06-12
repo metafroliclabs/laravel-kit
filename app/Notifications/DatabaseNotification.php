@@ -18,7 +18,7 @@ class DatabaseNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct($title, $message, $data)
+    public function __construct($title, $message, $data = [])
     {
         $this->title   = $title;
         $this->message = $message;

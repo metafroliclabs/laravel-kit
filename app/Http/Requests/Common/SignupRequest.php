@@ -26,7 +26,10 @@ class SignupRequest extends FormRequest
             'last_name' => 'required|string',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
-            'image' => 'nullable|file|mimes:jpeg,png,jpg|max:4096',
+            'country_code' => 'nullable',
+            'dial_code' => 'nullable',
+            'phone' => 'nullable',
+            'image' => 'nullable|mimes:jpeg,png,jpg|max:4096',
         ];
     }
 }

@@ -50,6 +50,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(PageController::class)->group(function () {
         Route::post('/contact-us', 'contact_us');
-        Route::get('/content', 'get_page');
+        Route::get('/get-page', 'get_page');
     });
 });

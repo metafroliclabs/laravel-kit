@@ -10,26 +10,34 @@ use Illuminate\Auth\AuthenticationException;
 
 class AuthService
 {
-    public function create($request){
+    public function create($request)
+    {
         return User::create($request->all());
     }
 
-    public function login($request){
-        if(auth()->attempt([
+    public function login($request)
+    {
+        if (auth()->attempt([
             'email' => $request->email,
             'password' => $request->password
-        ])){
-            if(auth()->user()->is_active == Constant::INACTIVE){
+        ])) {
+            $user = User::find(auth()->id());
+
+            if ($user->is_active == Constant::INACTIVE) {
                 throw new AuthorizationException("Your account is not active.");
             }
-            
-            if(auth()->user()->role == Constant::ADMIN){
+
+            if ($user->status !== Constant::APPROVED) {
+                throw new AuthorizationException("Your account is not approved yet.");
+            }
+
+            if ($user->role == Constant::ADMIN) {
                 throw new AuthenticationException("Invalid email or password.");
             }
 
             if ($request->device_id && $request->device_type) {
                 DeviceToken::updateOrCreate([
-                    'user_id'     => auth()->id()
+                    'user_id'     => $user->id
                 ], [
                     'device_id'   => $request->device_id,
                     'device_type' => $request->device_type
@@ -37,7 +45,6 @@ class AuthService
             }
 
             $token = $request->user()->createToken('main')->plainTextToken;
-            $user = User::find(auth()->id());
 
             // if ($request->device_id && $request->device_type) {
             //     $user->update($request->only('device_id', 'device_type'));
@@ -51,15 +58,17 @@ class AuthService
         throw new AuthenticationException("Invalid email or password.");
     }
 
-    public function login_admin($request){
-        if(auth()->attempt([
+    public function login_admin($request)
+    {
+        if (auth()->attempt([
             'email'    => $request->email,
             'password' => $request->password,
             'role'     => Constant::ADMIN
-        ])){
+        ])) {
             $token = $request->user()->createToken('main')->plainTextToken;
+            $user = User::find(auth()->id());
             return [
-                'user' => User::find(auth()->id()),
+                'user' => $user,
                 'access_token' => $token
             ];
         }

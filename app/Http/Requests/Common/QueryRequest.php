@@ -4,14 +4,14 @@ namespace App\Http\Requests\Common;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FeedbackRequest extends FormRequest
+class QueryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,7 @@ class FeedbackRequest extends FormRequest
         return [
             'name' => 'required|string',
             'email' => 'required|email',
-            'phone' => 'required|string',
+            'phone' => 'nullable',
             'user_type' => 'required|string',
             'subject' => 'required|string',
             'message' => 'required|string',
